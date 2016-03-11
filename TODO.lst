@@ -12,6 +12,7 @@ TODO:
 3.4. dns
 3.5. mysql 
 3.6. postgres
+3.7. link latency
 
 4. Add new types of notification:
 4.1. telegram
