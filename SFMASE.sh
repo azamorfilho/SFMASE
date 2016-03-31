@@ -8,7 +8,8 @@ MAILPROGRAM='/bin/mail'
 
 while read IP;
 do
-  PING=$($PINGPROGRAM -c1 $IP | grep ttl)
+  IP="`cut -d\| -f 1 hosts.txt`"
+  PING=$($PINGPROGRAM -H $IP -p 80)
   HOUR=$(date +'%H:%M:%S')
   if [[ -n $PING ]] ;
     then echo "$HOUR - $IP - OK" >> $FILENAME ;
@@ -17,3 +18,4 @@ do
       echo "$IP - is DOWN ($DATE $HOUR)" | $MAILPROGRAM -s "$IP is DOWN" $ADMINMAIL
   fi
 done < hosts.txt
+
