@@ -3,7 +3,7 @@
 ADMINMAIL='destination@domain.com'
 DATE=$(date +'%Y%m%d')
 FILENAME="SFMASE_$DATE.log"
-PINGPROGRAM='/bin/ping'
+PINGPROGRAM='/usr/lib64/nagios/plugins/check_tcp'
 MAILPROGRAM='/bin/mail'
 
 while read IP;
