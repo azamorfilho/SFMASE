@@ -17,5 +17,6 @@ do
       echo "$HOUR - $IP - FAIL" >> $FILENAME;
       echo "$IP - is DOWN ($DATE $HOUR)" | $MAILPROGRAM -s "$IP is DOWN" $ADMINMAIL
   fi
+  //
 done < hosts.txt
 
