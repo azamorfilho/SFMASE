@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 TODO:
 
 1. Send notifications after 4 consecutive fails.
@@ -19,3 +20,30 @@ TODO:
 4.2. jabber/gtalk
 4.3. sms
 4.4. IFTTT
+=======
+TODO:
+
+1. Send notifications after 4 consecutive fails.
+
+2. Add TCP checks:
+2.1. Use Nagios check_tcp plugin for generic TCP checks
+
+3. Add Application monitoring:
+3.1. http
+3.2. ssh
+3.3. ftp
+3.4. dns
+3.5. mysql 
+3.6. postgres
+
+4. Add new types of notification:
+4.1. telegram
+4.2. jabber/gtalk
+4.3. sms
+4.4. IFTTT
+4.5. email
+//
+
+5.
+
+>>>>>>> refs/remotes/origin/dev01
