@@ -1,8 +1,10 @@
 #!/bin/bash
 clear
-########################################################################################################################
-#         Observação: O arquivo hosts.txt sempre deverá ter uma linha em branco no final.							   #
-########################################################################################################################
+############################################################################################################################
+#         Observação: O arquivo hosts.txt sempre deverá ter uma linha em branco no final.				   #
+#		No arquivo hosts.txt é possível no primeiro campo digitar o IP ou o nome Ex.: iz.inf.br			   #
+#	As portas padrões dos serviços tais como (80-HTTP), (21-FTP), (22-ssh) serão testadas com os respectivos plugins.  #
+############################################################################################################################
 
 DATE=$(date +'%Y%m%d')
 HOUR=$(date +'%H:%M:%S')
@@ -99,8 +101,24 @@ verificaFtpStatus(){
 verificaSshStatus(){
 	CHECKSSHPROGRAM='/usr/lib64/nagios/plugins/check_ssh'
 	SERVICO="SSH"	
+	CHECKSSHPROGRAM='/usr/lib64/nagios/plugins/check_ssh'
+	SERVICO="SSH"	
 	
-	echo "EM BREVE VERIFICAÇÃO DE SSH"
+	for ((FALHAS=1;FALHAS<=4;FALHAS++))	
+	  do
+		CHECKSSH=$($CHECKSSHPROGRAM -H $IP)
+		if [[ "`echo "$CHECKSSH"|cut  -d" " -f 2 | cut -c1-2`" = "OK" ]]
+		  then 
+			echo "$HOUR - $IP:$PORTA - OK" >> $LOGNAME ;
+			FALHAS=5
+		  else
+			echo "$HOUR - $IP:$PORTA - FAIL" >> $LOGNAME;
+			if [[ "$FALHAS" = "4" ]]
+			  then
+				emiteNotificacao
+			fi
+		fi
+	done
 }
 
 verificaHttpStatus(){
