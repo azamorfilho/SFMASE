@@ -53,7 +53,21 @@ verificaMysqlStatus(){
 	CHECKMYSQLPROGRAM='/usr/lib64/nagios/plugins/check_mysql'
 	SERVICO="MYSQL"		
 	
-	echo "EM BREVE VERIFICAÇÃO DE MYSQL"
+	for ((FALHAS=1;FALHAS<=4;FALHAS++))	
+	  do
+		CHECKMYSQL=$($CHECKMYSQLPROGRAM $IP)
+		if [[ "`echo "$CHECKMYSQL"| cut  -d" " -f 1,2`" != "Can't connect" ]]
+		  then 
+			echo "$HOUR - $IP:$PORTA - OK" >> $LOGNAME ;
+			FALHAS=5
+		  else
+			echo "$HOUR - $IP:$PORTA - FAIL" >> $LOGNAME;
+			if [[ "$FALHAS" = "4" ]]
+			  then
+				emiteNotificacao
+			fi
+		fi
+	done
 }
 
 verificaDnsStatus(){
