@@ -1,10 +1,10 @@
 #!/bin/bash
 clear
-############################################################################################################################
-#         Observação: O arquivo hosts.txt sempre deverá ter uma linha em branco no final.				   #
-#		No arquivo hosts.txt é possível no primeiro campo digitar o IP ou o nome Ex.: iz.inf.br			   #
+########################################################################################################################
+#         Observação: O arquivo hosts.txt sempre deverá ter uma linha em branco no final.							   #
+#		No arquivo hosts.txt é possível no primeiro campo digitar o IP ou o nome Ex.: iz.inf.br						   #
 #	As portas padrões dos serviços tais como (80-HTTP), (21-FTP), (22-ssh) serão testadas com os respectivos plugins.  #
-############################################################################################################################
+########################################################################################################################
 
 DATE=$(date +'%Y%m%d')
 HOUR=$(date +'%H:%M:%S')
@@ -14,7 +14,7 @@ notificaEmail(){
 	MAILPROGRAM='/bin/mail'
 	ADMINMAIL='root@localhost'
 	
-	echo "$IP:$PORTA - is DOWN ($SERVICO) ($DATE $HOUR)" | $MAILPROGRAM -s "$IP:$PORTA is DOWN ($SERVICO)" $ADMINMAIL
+	echo "$IP:$PORTA - is DOWN ($SERVICO) ($DATE $HOUR) - MENSAGEM: $CHECK" | $MAILPROGRAM -s "$IP:$PORTA is DOWN ($SERVICO)" $ADMINMAIL
 }
 
 notificaJabber(){
@@ -46,7 +46,21 @@ verificaPgsqlStatus(){
 	CHECKPOSTGRESPROGRAM='/usr/lib64/nagios/plugins/check_pgsql'
 	SERVICO="POSTGRES"		
 	
-	echo "EM BREVE VERIFICAÇÃO DE POSTGRES"
+	for ((FALHAS=1;FALHAS<=4;FALHAS++))	
+	  do
+		CHECK=$($CHECKPOSTGRESPROGRAM $IP)	
+		if [[ "`echo "$CHECK"|cut -d" " -f 2`" = "OK" ]]
+		  then 
+			echo "$HOUR - $IP:$PORTA - OK" >> $LOGNAME ;
+			FALHAS=5
+		  else
+			echo "$HOUR - $IP:$PORTA - FAIL" >> $LOGNAME;
+			if [[ "$FALHAS" = "4" ]]
+			  then
+				emiteNotificacao
+			fi
+		fi
+	done
 }
 
 verificaMysqlStatus(){
@@ -55,8 +69,8 @@ verificaMysqlStatus(){
 	
 	for ((FALHAS=1;FALHAS<=4;FALHAS++))	
 	  do
-		CHECKMYSQL=$($CHECKMYSQLPROGRAM $IP)
-		if [[ "`echo "$CHECKMYSQL"| cut  -d" " -f 1,2`" != "Can't connect" ]]
+		CHECK=$($CHECKMYSQLPROGRAM $IP)
+		if [[ "`echo "$CHECK"| cut  -d" " -f 1,2`" != "Can't connect" ]]
 		  then 
 			echo "$HOUR - $IP:$PORTA - OK" >> $LOGNAME ;
 			FALHAS=5
@@ -76,8 +90,8 @@ verificaDnsStatus(){
 	
 	for ((FALHAS=1;FALHAS<=4;FALHAS++))	
 	  do
-		CHECKDNS=$($CHECKDNSPROGRAM $IP)
-		if [[ "`echo "$CHECKDNS"|cut  -d" " -f 2 | cut -c1-2`" = "OK" ]]
+		CHECK=$($CHECKDNSPROGRAM $IP)
+		if [[ "`echo "$CHECK"|cut  -d" " -f 2 | cut -c1-2`" = "OK" ]]
 		  then 
 			echo "$HOUR - $IP:$PORTA - OK" >> $LOGNAME ;
 			FALHAS=5
@@ -97,8 +111,8 @@ verificaFtpStatus(){
 	
 	for ((FALHAS=1;FALHAS<=4;FALHAS++))	
 	  do
-		CHECKFTP=$($CHECKFTPPROGRAM -H $IP)
-		if [[ "`echo "$CHECKFTP"|cut  -d" " -f 2 | cut -c1-2`" = "OK" ]]
+		CHECK=$($CHECKFTPPROGRAM -H $IP)
+		if [[ "`echo "$CHECK"|cut  -d" " -f 2 | cut -c1-2`" = "OK" ]]
 		  then 
 			echo "$HOUR - $IP:$PORTA - OK" >> $LOGNAME ;
 			FALHAS=5
@@ -115,13 +129,11 @@ verificaFtpStatus(){
 verificaSshStatus(){
 	CHECKSSHPROGRAM='/usr/lib64/nagios/plugins/check_ssh'
 	SERVICO="SSH"	
-	CHECKSSHPROGRAM='/usr/lib64/nagios/plugins/check_ssh'
-	SERVICO="SSH"	
 	
 	for ((FALHAS=1;FALHAS<=4;FALHAS++))	
 	  do
-		CHECKSSH=$($CHECKSSHPROGRAM -H $IP)
-		if [[ "`echo "$CHECKSSH"|cut  -d" " -f 2 | cut -c1-2`" = "OK" ]]
+		CHECK=$($CHECKSSHPROGRAM -H $IP)
+		if [[ "`echo "$CHECK"|cut  -d" " -f 2 | cut -c1-2`" = "OK" ]]
 		  then 
 			echo "$HOUR - $IP:$PORTA - OK" >> $LOGNAME ;
 			FALHAS=5
@@ -141,8 +153,8 @@ verificaHttpStatus(){
 	
 	for ((FALHAS=1;FALHAS<=4;FALHAS++))	
 	  do
-		CHECKHTTP=$($CHECKHTTPROGRAM -H $IP)
-		if [[ "`echo "$CHECKHTTP"|cut  -d" " -f 2 | cut -c1-2`" = "OK" ]]
+		CHECK=$($CHECKHTTPROGRAM -H $IP)
+		if [[ "`echo "$CHECK"|cut  -d" " -f 2 | cut -c1-2`" = "OK" ]]
 		  then 
 			echo "$HOUR - $IP:$PORTA - OK" >> $LOGNAME ;
 			FALHAS=5
@@ -164,8 +176,7 @@ verificaTcpStatus()
 	for ((FALHAS=1;FALHAS<=4;FALHAS++))	
 	  do
 		CHECKTCP=$($CHECKTCPPROGRAM -H $IP -p $PORTA)
-		
-		if [[ "$`echo "$CHECKTCP"|cut -d" " -f 2`" = "OK" ]]
+		if [[ "`echo "$CHECKTCP"|cut -d" " -f 2`" = "OK" ]]
 		  then 
 			echo "$HOUR - $IP:$PORTA - OK" >> $LOGNAME ;
 			FALHAS=5
