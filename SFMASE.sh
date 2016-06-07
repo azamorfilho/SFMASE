@@ -14,7 +14,7 @@ notificaEmail(){
 	MAILPROGRAM='/bin/mail'
 	ADMINMAIL='root@localhost'
 	
-	echo "$IP:$PORTA - is DOWN ($SERVICO) ($DATE $HOUR) - MENSAGEM: $CHECK" | $MAILPROGRAM -s "$IP:$PORTA is DOWN ($SERVICO)" $ADMINMAIL
+	echo "$IP:$PORTA - is DOWN ($SERVICO) ($DATE $HOUR) -  $CHECK" | $MAILPROGRAM -s "$IP:$PORTA is DOWN ($SERVICO)" $ADMINMAIL
 }
 
 notificaJabber(){
@@ -26,7 +26,10 @@ notificaSMS(){
 }
 
 notificaTelegram(){
-	echo "EM BREVE NOTIFICAÇÃO VIA TELEGRAM"
+	TELEGRAMPROGRAM='/usr/bin/telegram-cli'
+	DESTINATARIO='Teste'	
+	
+	$TELEGRAMPROGRAM -WR  -e "msg $DESTINATARIO $IP:$PORTA - is DOWN ($SERVICO) ($DATE $HOUR) - $CHECK"> /dev/null 2>&1 || exit 1 &
 }
 
 notificaIFTTT(){
@@ -175,8 +178,8 @@ verificaTcpStatus()
 	
 	for ((FALHAS=1;FALHAS<=4;FALHAS++))	
 	  do
-		CHECKTCP=$($CHECKTCPPROGRAM -H $IP -p $PORTA)
-		if [[ "`echo "$CHECKTCP"|cut -d" " -f 2`" = "OK" ]]
+		CHECKT=$($CHECKTCPPROGRAM -H $IP -p $PORTA)
+		if [[ "`echo "$CHECK"|cut -d" " -f 2`" = "OK" ]]
 		  then 
 			echo "$HOUR - $IP:$PORTA - OK" >> $LOGNAME ;
 			FALHAS=5
