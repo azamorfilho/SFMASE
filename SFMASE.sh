@@ -79,7 +79,21 @@ verificaFtpStatus(){
 	CHECKFTPPROGRAM='/usr/lib64/nagios/plugins/check_ftp'
 	SERVICO="FTP"		
 	
-	echo "EM BREVE VERIFICAÇÃO DE FTP"
+	for ((FALHAS=1;FALHAS<=4;FALHAS++))	
+	  do
+		CHECKFTP=$($CHECKFTPPROGRAM -H $IP)
+		if [[ "`echo "$CHECKFTP"|cut  -d" " -f 2 | cut -c1-2`" = "OK" ]]
+		  then 
+			echo "$HOUR - $IP:$PORTA - OK" >> $LOGNAME ;
+			FALHAS=5
+		  else
+			echo "$HOUR - $IP:$PORTA - FAIL" >> $LOGNAME;
+			if [[ "$FALHAS" = "4" ]]
+			  then
+				emiteNotificacao
+			fi
+		fi
+	done
 }
 
 verificaSshStatus(){
