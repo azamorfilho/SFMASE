@@ -6,9 +6,9 @@ clear
 #	As portas padrões dos serviços tais como (80-HTTP), (21-FTP), (22-ssh) serão testadas com os respectivos plugins.  #
 ########################################################################################################################
 
-DATE=$(date +'%Y%m%d')
+DATE=$(date +'%d/%m/%Y')
 HOUR=$(date +'%H:%M:%S')
-LOGNAME="SFMASE_$DATE.log"
+LOGNAME="SFMASE_$(date +'%Y%m%d').log"
 
 notificaEmail(){
 	MAILPROGRAM='/bin/mail'
