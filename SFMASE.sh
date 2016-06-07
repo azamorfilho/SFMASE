@@ -58,7 +58,21 @@ verificaDnsStatus(){
 	CHECKDNSPROGRAM='/usr/lib64/nagios/plugins/check_dns'
 	SERVICO="DNS"		
 	
-	echo "EM BREVE VERIFICAÇÃO DE DNS"
+	for ((FALHAS=1;FALHAS<=4;FALHAS++))	
+	  do
+		CHECKDNS=$($CHECKDNSPROGRAM $IP)
+		if [[ "`echo "$CHECKDNS"|cut  -d" " -f 2 | cut -c1-2`" = "OK" ]]
+		  then 
+			echo "$HOUR - $IP:$PORTA - OK" >> $LOGNAME ;
+			FALHAS=5
+		  else
+			echo "$HOUR - $IP:$PORTA - FAIL" >> $LOGNAME;
+			if [[ "$FALHAS" = "4" ]]
+			  then
+				emiteNotificacao
+			fi
+		fi
+	done
 }
 
 verificaFtpStatus(){
